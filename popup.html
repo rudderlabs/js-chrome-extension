@@ -1,0 +1,24 @@
+<html>
+<head>
+    <link rel="stylesheet" href="popup.css">
+    <script src="popup.js"></script>
+</head>
+<body style="width: 700px">
+    <img class="logo" src="logo32.png">
+    <h1>Events tracked to Segment</h1>
+    <input type="text" id="filterInput" placeholder="Filter Events">
+    <input type="button" id="configureButton" value="Configure">
+    <div id="contentDiv">
+        <div id="trackMessages">
+            Events will be here
+        </div>
+        <div class="buttonDiv">
+            <input type="button" id="clearButton" value="Clear log from this tab">
+        </div>
+    </div>
+    <div id="configurationDiv" class="configurationDiv" hidden="hidden">
+        API domains - comma separated list of domains used for Segment and Dreamdata events publishing
+        <textarea id="apiDomain" value="api.segment.io,cdn.dreamdata.cloud" placeholder="api.segment.io,cdn.dreamdata.cloud" rows="3">
+	</div>
+</body>
+</html>

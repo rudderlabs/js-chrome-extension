@@ -1,0 +1,21 @@
+{
+    "name": "RudderStack Event Tracker",
+    "manifest_version": 2,
+    "version": "0.1",
+    "description": "Inspect your RudderStack event payloads when they are called.",
+    "permissions": [
+        "<all_urls>",
+        "http://*/*",
+        "https://*/*",
+        "webRequest",
+        "webRequestBlocking"
+    ],
+    "browser_action": {
+        "default_popup": "popup.html"
+    },
+    "background": {
+        "scripts": [
+            "background.js"
+        ]
+    }
+}
