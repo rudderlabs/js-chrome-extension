@@ -1,21 +1,27 @@
 {
-    "name": "RudderStack Event Tracker",
-    "manifest_version": 2,
-    "version": "0.1",
-    "description": "Inspect your RudderStack event payloads when they are called.",
-    "permissions": [
-        "<all_urls>",
-        "http://*/*",
-        "https://*/*",
-        "webRequest",
-        "webRequestBlocking"
-    ],
-    "browser_action": {
-        "default_popup": "popup.html"
-    },
-    "background": {
-        "scripts": [
-            "background.js"
-        ]
-    }
+  "name": "RudderStack Event Tracker",
+  "description": "Inspect your RudderStack event payloads when they are called.",
+  "version": "1.0.0",
+  "manifest_version": 3,
+  "icons": {
+    "16": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "RudderStack Event Tracker",
+    "default_icon": "icon.png"
+  },
+  "host_permissions": ["<all_urls>", "http://*/*", "https://*/*"],
+  "permissions": [
+    "storage",
+    "webRequest",
+    "declarativeNetRequest",
+    "declarativeNetRequestWithHostAccess",
+    "declarativeNetRequestFeedback"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  }
 }

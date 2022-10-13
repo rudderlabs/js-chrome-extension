@@ -1,75 +1,78 @@
-const isRudderStackCall = (call) => {
-    let isRudderStack = true
+chrome.runtime.onConnect.addListener((port) => {
+  port.onMessage.addListener((msg) => {
+    let tabId = msg.tabId;
+    if (msg.type === 'update') {
+      updateEvents(tabId, port);
+    } else if (msg.type === 'clear') {
+      clearEvents(tabId);
+      updateEvents(tabId, port);
+    }
+  });
+});
 
-    return isRudderStack
-}
+let rudderStackEvents = [];
+let dataPlane;
+let writeKey;
 
-const sendEvent = (event) => {
-    console.log(1)
-    chrome.runtime.sendMessage(event);
-}
+const isRudderStackCall = (requestUrl) => {
+  const regexUrl = /^https:\/\/(.*)dataplane.rudderstack.com(.*)$/;
+  return regexUrl.test(requestUrl);
+};
+
+const isRudderStackConfig = (requestUrl) => {
+  const regexUrl = /^https:\/\/(.*)api.rudderlabs.com(.*)$/;
+  return regexUrl.test(requestUrl);
+};
+
+const addEvent = (event) => {
+  rudderStackEvents.unshift(event);
+  chrome.runtime.sendMessage({ type: 'add' });
+};
+
+const updateEvents = (tabId, port) => {
+  rudderStackEvents = rudderStackEvents.filter(
+    (event) => event.tabId === tabId
+  );
+  port.postMessage({
+    type: 'update',
+    data: rudderStackEvents,
+  });
+};
+
+const clearEvents = (tabId) => {
+  rudderStackEvents = rudderStackEvents.filter(
+    (event) => event.tabId !== tabId
+  );
+  port.postMessage({
+    type: 'update',
+    data: rudderStackEvents,
+  });
+};
 
 chrome.webRequest.onBeforeRequest.addListener(
-    (details) => {
-        if (isRudderStackCall(details.url)) {
-
-            chrome.tabs.query({active: true}, function(tabs) {
-
-                // since only one tab should be active and in the current window at once
-                // the return variable should only have one entry
-                const activeTabs = tabs.map(tab => tab.id)
-                if (activeTabs.includes(details.tabId)) {
-                    const regStr = /^https:\/\/(.*)dataplane.rudderstack.com(.*)$/
-                    if (regStr.test(details.url)) {
-                        const postedString = String.fromCharCode.apply(null, new Uint8Array(details.requestBody.raw[0].bytes));
-                        const rawEvent = JSON.parse(postedString);
-                        sendEvent(rawEvent)
-                    }
-                }
-             });
-            // var postedString = String.fromCharCode.apply(null, new Uint8Array(details.requestBody.raw[0].bytes));
-            // var rawEvent = JSON.parse(postedString);
-            // var event = {
-            //     raw: postedString,
-            //     trackedTime: formatDateToTime(new Date()),
-            // };
-            // withOpenTab((tab) => {
-            //     event.hostName = tab.url;
-            //     event.tabId = tab.id;
-            //     if (details.url.endsWith('/v1/t') || details.url.endsWith('/v2/t')) {
-            //         event.type = 'track';
-            //     } else if (details.url.endsWith('/v1/i') || details.url.endsWith('/v2/i')) {
-            //         event.type = 'identify';
-            //     } else if (details.url.endsWith('/v1/p') || details.url.endsWith('/v2/p')) {
-            //         event.type = 'pageLoad';
-            //     } else if (details.url.endsWith('/v1/batch') || details.url.endsWith('/v2/batch') || details.url.endsWith('/v1/b') || details.url.endsWith('/v2/b')) {
-            //         event.type = 'batch';
-            //     }
-            //     if (event.type) {
-            //         event.eventName = eventTypeToName(event.type) || rawEvent.event
-            //         addEvent(event);
-            //     }
-            // });
+  (details) => {
+    if (isRudderStackCall(details.url)) {
+      dataPlane = details.url.replace(/page|track|identify/gi, '');
+      console.log('dataPlane: ', dataPlane);
+      const requestBody = String.fromCharCode.apply(
+        null,
+        new Uint8Array(details.requestBody.raw[0].bytes)
+      );
+      const event = {
+        tabId: details.tabId,
+        payload: JSON.parse(requestBody),
+      };
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        if (tabs[0]) {
+          if (tabs[0].id === details.tabId) {
+            addEvent(event);
+          }
         }
-    }, {
-        urls: [
-            "https://*/*",
-            "http://*/*"
-        ]
-    },
-    ['blocking', 'requestBody']
+      });
+    }
+  },
+  {
+    urls: ['<all_urls>'],
+  },
+  ['requestBody']
 );
-// chrome.tabs.onUpdated.addListener( function (tabId, changeInfo, tab) {
-//     if (changeInfo.status == 'complete') {
-  
-//         chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-
-//             // since only one tab should be active and in the current window at once
-//             // the return variable should only have one entry
-//             console.log(tabs[0])
-       
-//          });
-  
-//     }
-//   })
-
