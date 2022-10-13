@@ -4,7 +4,7 @@ chrome.runtime.onConnect.addListener((port) => {
     if (msg.type === 'update') {
       updateEvents(tabId, port);
     } else if (msg.type === 'clear') {
-      clearEvents(tabId);
+      clearEvents(tabId, port);
       updateEvents(tabId, port);
     }
   });
@@ -39,7 +39,7 @@ const updateEvents = (tabId, port) => {
   });
 };
 
-const clearEvents = (tabId) => {
+const clearEvents = (tabId, port) => {
   rudderStackEvents = rudderStackEvents.filter(
     (event) => event.tabId !== tabId
   );
