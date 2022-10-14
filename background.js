@@ -6,11 +6,14 @@ chrome.runtime.onConnect.addListener((port) => {
     } else if (msg.type === 'clear') {
       clearEvents(tabId, port);
       updateEvents(tabId, port);
+    } else if (msg.type === 'filter') {
+      filterEvents(tabId, msg.filters, port);
     }
   });
 });
 
 let rudderStackEvents = [];
+let currentFilters = [];
 let dataPlane;
 let writeKey;
 
@@ -46,6 +49,22 @@ const clearEvents = (tabId, port) => {
   port.postMessage({
     type: 'update',
     data: rudderStackEvents,
+  });
+};
+
+const filterEvents = (tabId, filters, port) => {
+  let filteredEvents = [];
+  for (const filter of filters) {
+    rudderStackEvents.forEach((event) => {
+      if (event.payload.type === filter) {
+        filteredEvents.push(event);
+      }
+    });
+  }
+  port.postMessage({
+    type: 'filter',
+    data: filters.length === 0 ? rudderStackEvents : filteredEvents,
+    filters,
   });
 };
 

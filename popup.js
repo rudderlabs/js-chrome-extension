@@ -1,8 +1,23 @@
 const port = chrome.runtime.connect();
 
 port.onMessage.addListener((msg) => {
-  if (msg.type == 'update') {
+  if (msg.type === 'update') {
     renderEvents(msg);
+  } else if (msg.type === 'filter') {
+    renderEvents(msg);
+    // msg.filters.forEach((filter) => {
+    //   const filterInputs = [].slice.call(
+    //     document.getElementsByClassName('form-check-input')
+    //   );
+    //   console.log('filterInputs: ', filterInputs);
+    //   console.log('filter: ', filter);
+    //   filterInputs.map((input) => {
+    //     if (input.value === filter) {
+    //       input.checked = true;
+    //       console.log('input: ', input);
+    //     }
+    //   });
+    // });
   }
 });
 
@@ -14,28 +29,44 @@ chrome.runtime.onMessage.addListener((msg) => {
   }
 });
 
-const postMessage = (type) => {
+const postMessage = (type, filters = []) => {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     port.postMessage({
       type,
       tabId: tabs[0].id,
+      filters,
     });
   });
 };
 
 const renderEvents = (msg) => {
   const eventsContainer = document.getElementById('events-container');
-  // let eventsString = '<pre>';
   eventsContainer.innerHTML = '';
   msg.data.map(
     (m) =>
       (eventsContainer.innerHTML +=
-        '<div class="event"><pre>' +
+        `<div class="event collapsed ${m.payload.type}">` +
+        m.payload.type +
+        '<pre>' +
         syntaxHighlight(JSON.stringify(m.payload, undefined, 2)) +
-        '</div></pre>')
+        '</pre></div>')
   );
-  // eventsString += '</pre>';
-  // eventsContainer.innerHTML = eventsString;
+  toggleEventCollapse();
+};
+
+const toggleEventCollapse = () => {
+  var elements = Array.from(document.getElementsByClassName('event'));
+  for (const el of elements) {
+    el.addEventListener('click', () => {
+      if ([].slice.call(el.classList).indexOf('collapsed') != -1) {
+        el.classList.remove('collapsed');
+        el.classList.add('expanded');
+      } else {
+        el.classList.add('collapsed');
+        el.classList.remove('expanded');
+      }
+    });
+  }
 };
 
 const syntaxHighlight = (payload) => {
@@ -67,8 +98,28 @@ const clearEvents = () => {
   postMessage('clear');
 };
 
+const filterEvents = (e) => {
+  const filterInputs = [].slice.call(
+    document.getElementsByClassName('form-check-input')
+  );
+  const filtersArray = filterInputs
+    .filter((input) => input.checked)
+    .map((input) => input.value);
+  if (e.target.checked) {
+    postMessage('filter', filtersArray);
+  } else {
+    postMessage('filter', filtersArray);
+  }
+};
+
 document.addEventListener('DOMContentLoaded', () => {
   const clearBtn = document.getElementById('clear-button');
   clearBtn.addEventListener('click', clearEvents);
   postMessage('update');
+  const filterInputs = [].slice.call(
+    document.getElementsByClassName('form-check-input')
+  );
+  filterInputs.forEach((input) =>
+    input.addEventListener('change', filterEvents)
+  );
 });
