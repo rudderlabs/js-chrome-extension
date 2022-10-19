@@ -7,7 +7,6 @@
     <style>
       @import url('http://fonts.cdnfonts.com/css/basis-grotesque-pro');
     </style>
-    <!-- CSS only -->
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -15,7 +14,6 @@
       crossorigin="anonymous"
     />
     <link rel="stylesheet" href="popup.css" />
-
     <script src="popup.js"></script>
   </head>
   <body>
@@ -129,15 +127,15 @@
             >
           </div>
         </div>
-        <div class="nav-right__filters-button">
-          <button>Reset Filters</button>
+        <div class="nav-right__filters-button button">
+          <button id="reset">Reset Filters</button>
         </div>
       </div>
     </nav>
-    <div id="content">
-      <div id="events-container">Events will show up here</div>
-      <div id="button-container">
-        <button id="clear-button">Clear Events</button>
+    <div class="content">
+      <div class="contet__events-container">Events will show up here</div>
+      <div class="contet__search-button button">
+        <button id="clear">Clear Events</button>
       </div>
     </div>
   </body>
