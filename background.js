@@ -8,6 +8,8 @@ chrome.runtime.onConnect.addListener((port) => {
       updateEvents(tabId, port);
     } else if (msg.type === 'filter') {
       filterEvents(tabId, msg.filters, port);
+    } else if (msg.type === 'search') {
+      searchEvents(tabId, msg.searchValue, port);
     }
   });
 });
@@ -68,11 +70,25 @@ const filterEvents = (tabId, filters, port) => {
   });
 };
 
+const searchEvents = (tabId, searchValue, port) => {
+  let searchedEvents = [];
+  rudderStackEvents.forEach((event) => {
+    if (JSON.stringify(event).indexOf(searchValue) > -1) {
+      searchedEvents.push(event);
+    }
+  });
+
+  port.postMessage({
+    type: 'search',
+    data: searchedEvents,
+  });
+};
+
 chrome.webRequest.onBeforeRequest.addListener(
   (details) => {
     if (isRudderStackCall(details.url)) {
       dataPlane = details.url.replace(/page|track|identify/gi, '');
-      console.log('dataPlane: ', dataPlane);
+      // console.log('dataPlane: ', dataPlane);
       const requestBody = String.fromCharCode.apply(
         null,
         new Uint8Array(details.requestBody.raw[0].bytes)

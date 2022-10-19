@@ -4,6 +4,7 @@ port.onMessage.addListener((msg) => {
   if (msg.type === 'update') {
     renderEvents(msg);
   } else if (msg.type === 'filter') {
+    console.log('filter: ', msg);
     renderEvents(msg);
     // msg.filters.forEach((filter) => {
     //   const filterInputs = [].slice.call(
@@ -18,6 +19,9 @@ port.onMessage.addListener((msg) => {
     //     }
     //   });
     // });
+  } else if (msg.type === 'search') {
+    console.log('search: ', msg);
+    renderEvents(msg);
   }
 });
 
@@ -29,12 +33,13 @@ chrome.runtime.onMessage.addListener((msg) => {
   }
 });
 
-const postMessage = (type, filters = []) => {
+const postMessage = (type, filters = [], searchValue = '') => {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     port.postMessage({
       type,
       tabId: tabs[0].id,
       filters,
+      searchValue,
     });
   });
 };
@@ -45,11 +50,30 @@ const renderEvents = (msg) => {
   msg.data.map(
     (m) =>
       (eventsContainer.innerHTML +=
-        `<div class="event collapsed ${m.payload.type}">` +
-        m.payload.type +
-        '<pre>' +
+        `<div class="event ${m.payload.type} collapsed">` +
+        `<div class="event-details__short">` +
+        `<div class="event-details__short top">` +
+        `<span class="event-details__short type">${m.payload.type}</span>` +
+        `<span class="event-details__short name">${
+          m.payload.event ? `&nbsp;|&nbsp;${m.payload.event}` : ''
+        }</span>` +
+        `</div>` +
+        `<div class="event-details__short bottom">` +
+        `<span class="event-details__short userId">${
+          m.payload.userId
+            ? `User ID: ${m.payload.userId}`
+            : 'Unidentified User'
+        }</span>` +
+        `<span class="event-details__short anonymousId">Anonymous ID: ${m.payload.anonymousId}</span>` +
+        `<span class="event-details__short sentAt">Sent At: ${m.payload.sentAt}</span>` +
+        `</div>` +
+        `</div>` +
+        `<div class="event-details__full">` +
+        `<pre>` +
         syntaxHighlight(JSON.stringify(m.payload, undefined, 2)) +
-        '</pre></div>')
+        `</pre>` +
+        `</div>` +
+        `<div>`)
   );
   toggleEventCollapse();
 };
@@ -106,20 +130,38 @@ const filterEvents = (e) => {
     .filter((input) => input.checked)
     .map((input) => input.value);
   if (e.target.checked) {
-    postMessage('filter', filtersArray);
+    postMessage('filter', filtersArray, '');
   } else {
-    postMessage('filter', filtersArray);
+    postMessage('filter', filtersArray, '');
   }
+};
+
+const searchEvents = (e) => {
+  var eventElements = [].slice.call(document.getElementsByClassName('event'));
+  for (const event of eventElements) {
+    if (event.innerHTML.indexOf(e.target.value) === -1) {
+      event.style.display = 'none';
+    } else {
+      event.style.display = '';
+    }
+  }
+  // postMessage('search', [], e.target.value);
 };
 
 document.addEventListener('DOMContentLoaded', () => {
   const clearBtn = document.getElementById('clear-button');
   clearBtn.addEventListener('click', clearEvents);
-  postMessage('update');
+
   const filterInputs = [].slice.call(
     document.getElementsByClassName('form-check-input')
   );
   filterInputs.forEach((input) =>
     input.addEventListener('change', filterEvents)
   );
+
+  const searchInput = document.getElementById('search');
+  searchInput.addEventListener('keyup', searchEvents);
+
+  postMessage('filter', ['DOMContentLoaded']);
+  postMessage('update');
 });
