@@ -1,14 +1,15 @@
-chrome.runtime.onConnect.addListener((port) => {
-  port.onMessage.addListener((msg) => {
-    let tabId = msg.tabId;
-    if (msg.type === 'update') {
-      updateEvents(tabId, port);
-    } else if (msg.type === 'clear') {
-      clearEvents(tabId, port);
-      updateEvents(tabId, port);
-    } else if (msg.type === 'search') {
-      searchEvents(tabId, msg.searchValue, port);
-    }
+chrome.runtime.onInstalled.addListener((details) => {
+  chrome.storage.local.set({ filters: [], searchValue: '' });
+  chrome.runtime.onConnect.addListener((port) => {
+    port.onMessage.addListener((msg) => {
+      let tabId = msg.tabId;
+      if (msg.type === 'update') {
+        updateEvents(tabId, port);
+      } else if (msg.type === 'clear') {
+        clearEvents(tabId, port);
+        updateEvents(tabId, port);
+      }
+    });
   });
 });
 
@@ -48,20 +49,6 @@ const clearEvents = (tabId, port) => {
   port.postMessage({
     type: 'update',
     data: rudderStackEvents,
-  });
-};
-
-const searchEvents = (tabId, searchValue, port) => {
-  let searchedEvents = [];
-  rudderStackEvents.forEach((event) => {
-    if (JSON.stringify(event).indexOf(searchValue) > -1) {
-      searchedEvents.push(event);
-    }
-  });
-
-  port.postMessage({
-    type: 'search',
-    data: searchedEvents,
   });
 };
 

@@ -3,9 +3,6 @@ const port = chrome.runtime.connect();
 port.onMessage.addListener((msg) => {
   if (msg.type === 'update') {
     renderEvents(msg);
-  } else if (msg.type === 'search') {
-    console.log('search: ', msg);
-    renderEvents(msg);
   }
 });
 
@@ -60,15 +57,13 @@ const renderEvents = (msg) => {
         `<div>`)
   );
   toggleEventCollapse();
-  chrome.storage.local.get(['filters'], (result) => {
-    if (result.filters) {
-      filterEventsByStorage(result.filters);
-    }
+  chrome.storage.local.get(['filters', 'searchValue'], (result) => {
+    handleFilter();
   });
 };
 
 const toggleEventCollapse = () => {
-  var eventElements = Array.from(document.getElementsByClassName('event'));
+  var eventElements = [].slice.call(document.getElementsByClassName('event'));
   for (const eventEl of eventElements) {
     eventEl.addEventListener('click', () => {
       if ([].slice.call(eventEl.classList).indexOf('collapsed') != -1) {
@@ -111,7 +106,25 @@ const clearEvents = () => {
   postMessage('clear');
 };
 
-const filterEventsByDOM = () => {
+document.addEventListener('DOMContentLoaded', () => {
+  const clearBtn = document.getElementById('clear');
+  clearBtn.addEventListener('click', clearEvents);
+
+  const filterInputEls = [].slice.call(
+    document.getElementsByClassName('form-check-input')
+  );
+  filterInputEls.forEach((input) => input.addEventListener('change', filter));
+
+  const resetBtn = document.getElementById('reset');
+  resetBtn.addEventListener('click', reset);
+
+  const searchInputEl = document.getElementById('search');
+  searchInputEl.addEventListener('keyup', search);
+
+  postMessage('update');
+});
+
+const filter = () => {
   const filterInputEls = [].slice.call(
     document.getElementsByClassName('form-check-input')
   );
@@ -120,71 +133,77 @@ const filterEventsByDOM = () => {
     .map((filter) => filter.value);
 
   chrome.storage.local.set({ filters }, () => {
-    if (filters) {
-      filterEventsByStorage(filters);
-    }
+    handleFilter();
   });
 };
 
-const filterEventsByStorage = (filters) => {
+const search = (e) => {
+  let searchValue = e.target.value;
+  chrome.storage.local.set({ searchValue }, () => {
+    handleFilter();
+  });
+};
+
+const reset = () => {
+  let filters = [];
+  let searchValue = '';
+  chrome.storage.local.set({ filters, searchValue }, () => {
+    handleFilter();
+  });
+};
+
+const handleFilter = () => {
   const eventElements = [].slice.call(document.getElementsByClassName('event'));
   const filterInputEls = [].slice.call(
     document.getElementsByClassName('form-check-input')
   );
-
-  if (filters.length === 0) {
-    for (const eventEl of eventElements) {
-      eventEl.style.display = 'block';
-    }
-    filterInputEls.map((input) => (input.checked = false));
-  } else {
-    for (const eventEl of eventElements) {
-      if (filters.indexOf(eventEl.getAttribute('data-type')) > -1) {
-        eventEl.style.display = 'block';
-      } else {
-        eventEl.style.display = 'none';
+  const searchInputEl = document.getElementById('search');
+  chrome.storage.local.get(['filters', 'searchValue'], (result) => {
+    if (result.filters.length > 0 && result.searchValue !== '') {
+      for (const eventEl of eventElements) {
+        if (
+          result.filters.indexOf(eventEl.getAttribute('data-type')) > -1 &&
+          eventEl.innerHTML.indexOf(result.searchValue) !== -1
+        ) {
+          eventEl.style.display = 'block';
+        } else {
+          eventEl.style.display = 'none';
+        }
       }
+      filterInputEls
+        .filter((input) => result.filters.indexOf(input.value) > -1)
+        .map((input) => (input.checked = true));
+      searchInputEl.value = result.searchValue;
+    } else if (result.filters.length > 0 && result.searchValue === '') {
+      for (const eventEl of eventElements) {
+        if (result.filters.indexOf(eventEl.getAttribute('data-type')) > -1) {
+          eventEl.style.display = 'block';
+        } else {
+          eventEl.style.display = 'none';
+        }
+      }
+      filterInputEls
+        .filter((input) => result.filters.indexOf(input.value) > -1)
+        .map((input) => (input.checked = true));
+      searchInputEl.value = result.searchValue;
+    } else if (result.filters.length === 0 && result.searchValue !== '') {
+      for (const eventEl of eventElements) {
+        if (eventEl.innerHTML.indexOf(result.searchValue) !== -1) {
+          eventEl.style.display = 'block';
+        } else {
+          eventEl.style.display = 'none';
+        }
+      }
+      filterInputEls
+        .filter((input) => result.filters.indexOf(input.value) > -1)
+        .map((input) => (input.checked = false));
+      searchInputEl.value = result.searchValue;
+    } else if (result.filters.length === 0 && result.searchValue === '') {
+      for (const eventEl of eventElements) {
+        eventEl.style.display = 'block';
+      }
+      filterInputEls.map((input) => (input.checked = false));
+      searchInputEl.value = result.searchValue;
     }
-    filterInputEls
-      .filter((input) => filters.indexOf(input.value) > -1)
-      .map((input) => (input.checked = true));
-  }
-};
-
-const resetFilters = () => {
-  const filters = [];
-  chrome.storage.local.set({ filters }, () => {
-    filterEventsByStorage(filters);
   });
 };
-
-const searchEvents = (e) => {
-  var eventElements = [].slice.call(document.getElementsByClassName('event'));
-  for (const eventEl of eventElements) {
-    if (eventEl.innerHTML.indexOf(e.target.value) === -1) {
-      eventEl.style.display = 'none';
-    } else {
-      eventEl.style.display = '';
-    }
-  }
-};
-
-document.addEventListener('DOMContentLoaded', () => {
-  const clearBtn = document.getElementById('clear');
-  clearBtn.addEventListener('click', clearEvents);
-
-  const filterInputEls = [].slice.call(
-    document.getElementsByClassName('form-check-input')
-  );
-  filterInputEls.forEach((input) =>
-    input.addEventListener('change', filterEventsByDOM)
-  );
-
-  const resetBtn = document.getElementById('reset');
-  resetBtn.addEventListener('click', resetFilters);
-
-  const searchInputEl = document.getElementById('search');
-  searchInputEl.addEventListener('keyup', searchEvents);
-
-  postMessage('update');
-});
