@@ -3,6 +3,7 @@ const port = chrome.runtime.connect();
 port.onMessage.addListener((msg) => {
   if (msg.type === 'update') {
     renderEvents(msg);
+    renderSeachAndFilters(msg);
   }
 });
 
@@ -14,10 +15,12 @@ chrome.runtime.onMessage.addListener((msg) => {
   }
 });
 
-const postMessage = (type) => {
+const postMessage = (type, searchValue = '', filters = []) => {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     port.postMessage({
       type,
+      searchValue,
+      filters,
       tabId: tabs[0].id,
     });
   });
@@ -28,7 +31,7 @@ const renderEvents = (msg) => {
     'contet__events-container'
   )[0];
   eventsContainer.innerHTML = '';
-  msg.data.map(
+  msg.events.map(
     (m) =>
       (eventsContainer.innerHTML +=
         `<div class="event ${m.payload.type} collapsed" data-type="${m.payload.type}">` +
@@ -57,9 +60,22 @@ const renderEvents = (msg) => {
         `<div>`)
   );
   toggleEventCollapse();
-  chrome.storage.local.get(['filters', 'searchValue'], (result) => {
-    handleFilter();
-  });
+};
+
+const renderSeachAndFilters = (msg) => {
+  const searchInputEl = document.getElementById('search');
+  searchInputEl.value = msg.searchValue;
+
+  const filterInputEls = [].slice.call(
+    document.getElementsByClassName('form-check-input')
+  );
+  if (msg.filters.length > 0) {
+    filterInputEls
+      .filter((input) => msg.filters.indexOf(input.value) > -1)
+      .map((input) => (input.checked = true));
+  } else {
+    filterInputEls.map((input) => (input.checked = false));
+  }
 };
 
 const toggleEventCollapse = () => {
@@ -113,18 +129,25 @@ document.addEventListener('DOMContentLoaded', () => {
   const filterInputEls = [].slice.call(
     document.getElementsByClassName('form-check-input')
   );
-  filterInputEls.forEach((input) => input.addEventListener('change', filter));
-
-  const resetBtn = document.getElementById('reset');
-  resetBtn.addEventListener('click', reset);
+  filterInputEls.forEach((input) =>
+    input.addEventListener('change', filterEvents)
+  );
 
   const searchInputEl = document.getElementById('search');
-  searchInputEl.addEventListener('keyup', search);
+  searchInputEl.addEventListener('keyup', filterEvents);
+
+  const resetBtn = document.getElementById('reset');
+  resetBtn.addEventListener('click', resetFilters);
 
   postMessage('update');
 });
 
-const filter = () => {
+const resetFilters = () => {
+  postMessage('reset', '', []);
+};
+
+const filterEvents = () => {
+  const searchValue = document.getElementById('search').value;
   const filterInputEls = [].slice.call(
     document.getElementsByClassName('form-check-input')
   );
@@ -132,78 +155,5 @@ const filter = () => {
     .filter((filter) => filter.checked)
     .map((filter) => filter.value);
 
-  chrome.storage.local.set({ filters }, () => {
-    handleFilter();
-  });
-};
-
-const search = (e) => {
-  let searchValue = e.target.value;
-  chrome.storage.local.set({ searchValue }, () => {
-    handleFilter();
-  });
-};
-
-const reset = () => {
-  let filters = [];
-  let searchValue = '';
-  chrome.storage.local.set({ filters, searchValue }, () => {
-    handleFilter();
-  });
-};
-
-const handleFilter = () => {
-  const eventElements = [].slice.call(document.getElementsByClassName('event'));
-  const filterInputEls = [].slice.call(
-    document.getElementsByClassName('form-check-input')
-  );
-  const searchInputEl = document.getElementById('search');
-  chrome.storage.local.get(['filters', 'searchValue'], (result) => {
-    if (result.filters.length > 0 && result.searchValue !== '') {
-      for (const eventEl of eventElements) {
-        if (
-          result.filters.indexOf(eventEl.getAttribute('data-type')) > -1 &&
-          eventEl.innerHTML.indexOf(result.searchValue) !== -1
-        ) {
-          eventEl.style.display = 'block';
-        } else {
-          eventEl.style.display = 'none';
-        }
-      }
-      filterInputEls
-        .filter((input) => result.filters.indexOf(input.value) > -1)
-        .map((input) => (input.checked = true));
-      searchInputEl.value = result.searchValue;
-    } else if (result.filters.length > 0 && result.searchValue === '') {
-      for (const eventEl of eventElements) {
-        if (result.filters.indexOf(eventEl.getAttribute('data-type')) > -1) {
-          eventEl.style.display = 'block';
-        } else {
-          eventEl.style.display = 'none';
-        }
-      }
-      filterInputEls
-        .filter((input) => result.filters.indexOf(input.value) > -1)
-        .map((input) => (input.checked = true));
-      searchInputEl.value = result.searchValue;
-    } else if (result.filters.length === 0 && result.searchValue !== '') {
-      for (const eventEl of eventElements) {
-        if (eventEl.innerHTML.indexOf(result.searchValue) !== -1) {
-          eventEl.style.display = 'block';
-        } else {
-          eventEl.style.display = 'none';
-        }
-      }
-      filterInputEls
-        .filter((input) => result.filters.indexOf(input.value) > -1)
-        .map((input) => (input.checked = false));
-      searchInputEl.value = result.searchValue;
-    } else if (result.filters.length === 0 && result.searchValue === '') {
-      for (const eventEl of eventElements) {
-        eventEl.style.display = 'block';
-      }
-      filterInputEls.map((input) => (input.checked = false));
-      searchInputEl.value = result.searchValue;
-    }
-  });
+  postMessage('filter', searchValue, filters);
 };
