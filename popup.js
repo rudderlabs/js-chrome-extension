@@ -45,11 +45,11 @@ const renderEvents = (msg) => {
         `<div class="event-details__short bottom">` +
         `<span class="event-details__short userId">${
           m.payload.userId
-            ? `User ID: ${m.payload.userId}`
-            : 'Unidentified User'
+            ? `User ID:<br> ${m.payload.userId}`
+            : 'Unidentified<br>User'
         }</span>` +
-        `<span class="event-details__short anonymousId">Anonymous ID: ${m.payload.anonymousId}</span>` +
-        `<span class="event-details__short sentAt">Sent At: ${m.payload.sentAt}</span>` +
+        `<span class="event-details__short anonymousId">Anonymous ID:<br> ${m.payload.anonymousId}</span>` +
+        `<span class="event-details__short sentAt">Sent At:<br> ${m.payload.sentAt}</span>` +
         `</div>` +
         `</div>` +
         `<div class="event-details__full">` +
@@ -60,6 +60,23 @@ const renderEvents = (msg) => {
         `<div>`)
   );
   toggleEventCollapse();
+  toggleClearBtnState(msg.events);
+  toggleResetBtnState(msg.filters, msg.searchValue);
+};
+
+const toggleClearBtnState = (events) => {
+  const clearBtn = document.getElementById('clear');
+  clearBtn.disabled = events.length === 0 ? true : false;
+};
+
+const toggleResetBtnState = (filters, searchValue) => {
+  console.log('toggleResetBtnState: ', filters, searchValue);
+  console.log('searchValue: ', searchValue);
+
+  const resetBtn = document.getElementById('reset');
+  console.log('resetBtn: ', resetBtn);
+
+  resetBtn.disabled = filters.length === 0 && searchValue === '' ? true : false;
 };
 
 const renderSeachAndFilters = (msg) => {
@@ -79,15 +96,20 @@ const renderSeachAndFilters = (msg) => {
 };
 
 const toggleEventCollapse = () => {
-  var eventElements = [].slice.call(document.getElementsByClassName('event'));
+  var eventElements = [].slice.call(
+    document.getElementsByClassName('event-details__short')
+  );
   for (const eventEl of eventElements) {
     eventEl.addEventListener('click', () => {
-      if ([].slice.call(eventEl.classList).indexOf('collapsed') != -1) {
-        eventEl.classList.remove('collapsed');
-        eventEl.classList.add('expanded');
+      if (
+        [].slice.call(eventEl.parentElement.classList).indexOf('collapsed') !=
+        -1
+      ) {
+        eventEl.parentElement.classList.remove('collapsed');
+        eventEl.parentElement.classList.add('expanded');
       } else {
-        eventEl.classList.add('collapsed');
-        eventEl.classList.remove('expanded');
+        eventEl.parentElement.classList.add('collapsed');
+        eventEl.parentElement.classList.remove('expanded');
       }
     });
   }
@@ -113,7 +135,9 @@ const syntaxHighlight = (payload) => {
       } else if (/null/.test(match)) {
         cls = 'null';
       }
-      return `<span class=${cls}>${match}</span>`;
+      return `<span class=${cls}>${
+        cls === 'key' ? match.replace(/['"]+/g, '') : match
+      }</span>`;
     }
   );
 };
@@ -123,9 +147,6 @@ const clearEvents = () => {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-  const clearBtn = document.getElementById('clear');
-  clearBtn.addEventListener('click', clearEvents);
-
   const filterInputEls = [].slice.call(
     document.getElementsByClassName('form-check-input')
   );
@@ -138,6 +159,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const resetBtn = document.getElementById('reset');
   resetBtn.addEventListener('click', resetFilters);
+
+  const clearBtn = document.getElementById('clear');
+  clearBtn.addEventListener('click', clearEvents);
 
   postMessage('update');
 });

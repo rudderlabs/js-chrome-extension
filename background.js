@@ -11,7 +11,6 @@ chrome.runtime.onConnect.addListener((port) => {
       updateEvents(tabId, port);
     } else if (msg.type === 'clear') {
       clearEvents(tabId, port);
-      updateEvents(tabId, port);
     } else if (msg.type === 'filter') {
       filterEvents(tabId, searchValue, filters, port);
     } else if (msg.type === 'reset') {
@@ -38,7 +37,11 @@ const addEvent = (event, tabId) => {
 };
 
 const updateEvents = (tabId, port) => {
-  if (tabData[tabId].filters && tabData[tabId].filters.length > 0) {
+  if (
+    tabData[tabId] &&
+    tabData[tabId].filters &&
+    tabData[tabId].filters.length > 0
+  ) {
     filterEvents(
       tabId,
       tabData[tabId].searchValue,
@@ -50,7 +53,7 @@ const updateEvents = (tabId, port) => {
 
     tabData[tabId] = tabData[tabId] || {};
     tabData[tabId].filters = tabData[tabId].filters || [];
-    tabData[tabId].searchValue = tabData[tabId].filters || '';
+    tabData[tabId].searchValue = tabData[tabId].searchValue || '';
 
     port.postMessage({
       type: 'update',
@@ -73,10 +76,12 @@ const resetEvents = (tabId, port) => {
 };
 
 const clearEvents = (tabId, port) => {
-  events = tabData[tabId].events.filter((event) => event.tabId !== tabId);
+  tabData[tabId].events = [];
+  tabData[tabId].searchValue = '';
+  tabData[tabId].filters = [];
   port.postMessage({
     type: 'update',
-    events: events,
+    events: tabData[tabId].events,
     searchValue: tabData[tabId].searchValue,
     filters: tabData[tabId].filters,
   });

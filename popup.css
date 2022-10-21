@@ -5,8 +5,8 @@
 }
 
 body {
-  width: 750px;
-  height: 300px;
+  width: 800px;
+  height: auto;
 }
 
 .nav {
@@ -49,53 +49,30 @@ body {
   padding: 5px;
 }
 
-button {
+button#reset,
+button#clear {
   box-sizing: inherit;
-  color: #eeeeee;
   padding-top: 3px;
   padding-bottom: 3px;
-  margin-right: 0px;
-  background: transparent;
   font-size: 14px;
-  text-align: center;
-  font-weight: 700;
-  border: 1px solid #dcdbff;
-  -webkit-box-pack: center;
-  justify-content: center;
-  -webkit-box-align: center;
-  align-items: center;
-  text-decoration: none;
-  border-radius: 8px;
-  display: inline-block;
+}
+button#reset {
+  border-color: #fff;
   width: 100%;
-  padding-left: 48px;
-  padding-right: 48px;
-  background-color: #070e1f;
 }
 
-button:hover {
-  line-height: 1.5;
-  box-sizing: inherit;
-  background: transparent;
-  font-size: 14px;
-  text-align: center;
-  font-weight: 700;
-  border: 1px solid #dcdbff;
-  -webkit-box-pack: center;
-  justify-content: center;
-  -webkit-box-align: center;
-  align-items: center;
-  text-decoration: none;
-  border-radius: 8px;
-  display: inline-block;
-  text-decoration-color: inherit;
-  color: #070e1f;
-  background-color: #eeeeee;
+button#clear {
+  width: 254.172px;
 }
 
 .content {
-  padding: 1% 2%;
+  padding: 1% 1%;
   height: auto;
+}
+
+.contet__events-container {
+  height: 300px;
+  overflow-y: scroll;
 }
 
 .event {
@@ -103,42 +80,35 @@ button:hover {
   padding: 1%;
   background-color: blue;
   border: 1px solid #f5f5f5;
+  border-radius: 6px;
   color: #fff;
   font-size: 18px;
 }
 
 .page {
-  background: linear-gradient(
-    135.55deg,
-    rgba(253, 29, 29, 1) 6.09%,
-    rgba(252, 176, 69, 1) 116.03%
-  );
+  background-color: #d692f6;
 }
 
 .track {
-  background: linear-gradient(
-    135.55deg,
-    rgb(62, 53, 209) 6.09%,
-    rgb(134, 248, 224) 116.03%
-  );
+  background-color: #3e34d1;
 }
 
 .identify {
-  background: linear-gradient(
-    135.55deg,
-    rgba(255, 0, 243, 1) 6.09%,
-    rgba(0, 255, 190, 1) 116.03%
-  );
+  background-color: #85f8e0;
 }
 
 .event pre {
   background-color: #fff;
   color: black;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 12px;
+  font-weight: bold;
 }
 
 .event-details__short {
   display: flex;
   flex-direction: column;
+  cursor: pointer;
 }
 
 .event-details__short.top,
@@ -177,27 +147,41 @@ button:hover {
 }
 
 .string {
-  color: green;
+  color: red;
 }
 .number {
-  color: darkorange;
+  color: blue;
 }
 .boolean {
   color: blue;
 }
 .null {
-  color: magenta;
-}
-.key {
   color: red;
 }
-
-.contet__search-button {
-  display: flex;
-  align-items: flex-end;
-  justify-content: flex-end;
+.key {
+  color: purple;
 }
 
-.contet__search-button button {
-  width: 254.172px;
+.contet__clear-button {
+  text-align: right;
+  margin-top: 1%;
 }
+
+/* .contet__events-container::-webkit-scrollbar {
+  width: 20px;
+}
+
+.contet__events-container::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+.contet__events-container::-webkit-scrollbar-thumb {
+  background-color: #d6dee1;
+  border-radius: 20px;
+  border: 6px solid transparent;
+  background-clip: content-box;
+}
+
+.contet__events-container::-webkit-scrollbar-thumb:hover {
+  background-color: #a8bbbf;
+} */
