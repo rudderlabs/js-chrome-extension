@@ -54,7 +54,12 @@ const renderEvents = (msg) => {
         `</div>` +
         `<div class="event-details__full">` +
         `<pre>` +
-        syntaxHighlight(JSON.stringify(m.payload, undefined, 2)) +
+        `<button title="copy to clipboard" id="copyToClipboard" class="copy-to-clipboard btn btn-outline-dark">` +
+        `<img title="copy to clipboard" class="copy-to-clipboard" src="c2c-black.png"/>` +
+        `</button>` +
+        `<code>${syntaxHighlight(
+          JSON.stringify(m.payload, undefined, 2)
+        )}</code>` +
         `</pre>` +
         `</div>` +
         `<div>`)
@@ -62,6 +67,37 @@ const renderEvents = (msg) => {
   toggleEventCollapse();
   toggleClearBtnState(msg.events);
   toggleResetBtnState(msg.filters, msg.searchValue);
+  addCopyToClipboardEventListeners();
+};
+
+const addCopyToClipboardEventListeners = () => {
+  const icons = [].slice.call(
+    document.getElementsByClassName('copy-to-clipboard')
+  );
+  for (const icon of icons) {
+    icon.addEventListener('click', () => {
+      if (navigator && navigator.clipboard && navigator.clipboard.writeText)
+        return navigator.clipboard.writeText(
+          icon.parentElement.parentElement.getElementsByTagName('code')[0]
+            .textContent
+        );
+      return Promise.reject('The Clipboard API is not available.');
+    });
+    icon.addEventListener('mouseover', () => {
+      if (icon.src) {
+        icon.src = 'c2c-white.png';
+      } else {
+        icon.getElementsByTagName('img')[0].src = 'c2c-white.png';
+      }
+    });
+    icon.addEventListener('mouseleave', () => {
+      if (icon.src) {
+        icon.src = 'c2c-black.png';
+      } else {
+        icon.getElementsByTagName('img')[0].src = 'c2c-black.png';
+      }
+    });
+  }
 };
 
 const toggleClearBtnState = (events) => {
@@ -70,12 +106,7 @@ const toggleClearBtnState = (events) => {
 };
 
 const toggleResetBtnState = (filters, searchValue) => {
-  console.log('toggleResetBtnState: ', filters, searchValue);
-  console.log('searchValue: ', searchValue);
-
   const resetBtn = document.getElementById('reset');
-  console.log('resetBtn: ', resetBtn);
-
   resetBtn.disabled = filters.length === 0 && searchValue === '' ? true : false;
 };
 
@@ -135,9 +166,7 @@ const syntaxHighlight = (payload) => {
       } else if (/null/.test(match)) {
         cls = 'null';
       }
-      return `<span class=${cls}>${
-        cls === 'key' ? match.replace(/['"]+/g, '') : match
-      }</span>`;
+      return `<span class=${cls}>${match}</span>`;
     }
   );
 };
