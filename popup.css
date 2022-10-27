@@ -18,7 +18,7 @@ body {
   color: #fff;
   height: auto;
   width: 100%;
-  padding: 2%;
+  padding: 2% 1% 2% 2%;
 }
 
 .nav-left {
@@ -50,19 +50,37 @@ body {
 }
 
 button#reset,
-button#clear {
+button#clear,
+button#userId,
+button#anonId,
+button#userTraits {
   box-sizing: inherit;
   padding-top: 3px;
   padding-bottom: 3px;
   font-size: 14px;
 }
+
 button#reset {
   border-color: #fff;
   width: 100%;
 }
 
 button#clear {
+  width: 46px;
+  height: 34px;
+}
+
+button#userId,
+button#anonId,
+button#userTraits {
   width: 254.172px;
+}
+
+.user-data {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  margin: 1% 0;
 }
 
 .content {
@@ -182,4 +200,8 @@ button#copyToClipboard {
 button#copyToClipboard img {
   height: 20px;
   width: 20px;
+}
+
+.contet__events-container-no-events {
+  text-align: center;
 }
