@@ -12,7 +12,7 @@ body {
 .nav {
   display: flex;
   flex-direction: row;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: center;
   background-color: #070e1f;
   color: #fff;
@@ -21,21 +21,22 @@ body {
   padding: 2% 1% 2% 2%;
 }
 
-.nav-left {
-  flex-grow: 4;
+.nav__left {
+  display: flex;
+  flex-direction: column;
 }
 
-.nav-left__logo,
-.nav-left__title {
+.nav__logo,
+.nav__title {
   display: inline-block;
   margin: 0;
 }
 
-.nav-left__title h1 {
+.nav__title h1 {
   font-size: 18px;
 }
 
-.nav-right__search input#search {
+.nav__search .nav__search-input {
   margin: 0;
   font-family: inherit;
   tab-size: 4;
@@ -49,18 +50,16 @@ body {
   padding: 5px;
 }
 
-button#reset,
+.nav__reset__button,
 button#clear,
-button#userId,
-button#anonId,
-button#userTraits {
+.user-data__button {
   box-sizing: inherit;
   padding-top: 3px;
   padding-bottom: 3px;
   font-size: 14px;
 }
 
-button#reset {
+.nav__reset__button {
   border-color: #fff;
   width: 100%;
 }
@@ -70,22 +69,63 @@ button#clear {
   height: 34px;
 }
 
-button#userId,
-button#anonId,
-button#userTraits {
+.user-data__button {
   width: 254.172px;
+}
+
+.user-data__buttons-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin-right: 1%;
+}
+
+.user-data__info {
+  padding: 1%;
+  border-radius: 5px;
+  border: 1px solid black;
+  width: 100%;
+  overflow-y: scroll;
+  margin-bottom: 0;
+}
+
+.user-data__info::-webkit-scrollbar {
+  -webkit-appearance: none;
+}
+
+.user-data__info::-webkit-scrollbar:vertical {
+  width: 11px;
+}
+
+.user-data__info::-webkit-scrollbar:horizontal {
+  height: 11px;
+}
+
+.user-data__info::-webkit-scrollbar-thumb {
+  border-radius: 8px;
+  border: 2px solid white; /* should match background, can't be transparent */
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.user-data__info__text {
+  color: red;
+}
+
+.content,
+.user-data {
+  padding: 0 1%;
+  height: auto;
+}
+
+.content {
+  padding: 1% 1%;
 }
 
 .user-data {
   display: flex;
   flex-direction: row;
-  justify-content: space-around;
-  margin: 1% 0;
-}
-
-.content {
-  padding: 1% 1%;
-  height: auto;
+  height: 120px;
+  padding: 1% 1% 0 1%;
 }
 
 .contet__events-container {
@@ -187,8 +227,11 @@ button#userTraits {
 }
 
 .contet__clear-button {
+  /* position: absolute;
+  bottom: 1%;
+  right: 1%;
+  width: 100%; */
   text-align: right;
-  margin-top: 1%;
 }
 
 button#copyToClipboard {

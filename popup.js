@@ -13,9 +13,37 @@ chrome.runtime.onMessage.addListener((msg) => {
   } else if (msg.type === 'add') {
     postMessage('update');
   } else if (msg.type === 'userInfo') {
-    console.log('user data: ', msg);
+    displayUserInfo(msg);
   }
 });
+
+const displayUserInfo = (msg) => {
+  const userInfoEl = document.getElementsByClassName('user-data__info')[0];
+  if (msg.id === 'userId') {
+    userInfoEl.innerHTML =
+      msg[msg.id] === ''
+        ? `<pre class="user-data__info__text"><code>Undentified User</code></pre>`
+        : `<pre class="user-data__info__text"><code>${
+            msg[msg.id]
+          }</code></pre>`;
+  } else if (msg.id === 'anonymousId') {
+    userInfoEl.innerHTML = `<pre class="user-data__info__text"><code>${
+      msg[msg.id]
+    }</code></pre>`;
+  } else if (msg.id === 'userTraits') {
+    if (Object.keys(msg[msg.id]).length > 0) {
+      userInfoEl.innerHTML =
+        `<pre class="user-data__info__json">` +
+        `</button>` +
+        `<code>${syntaxHighlight(
+          JSON.stringify(msg[msg.id], undefined, 2)
+        )}</code>` +
+        `</pre>`;
+    } else {
+      userInfoEl.innerHTML = '<pre><code>No User Traits</code></pre>';
+    }
+  }
+};
 
 const postMessage = (type, searchValue = '', filters = []) => {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -137,11 +165,11 @@ const addCopyToClipboardListeners = () => {
 };
 
 const renderSeachAndFilters = (msg) => {
-  const searchInputEl = document.getElementById('search');
+  const searchInputEl = document.getElementsByClassName('nav__search-input')[0];
   searchInputEl.value = msg.searchValue;
 
   const filterInputEls = [].slice.call(
-    document.getElementsByClassName('form-check-input')
+    document.getElementsByClassName('nav__filters-check-input')
   );
   if (msg.filters.length > 0) {
     filterInputEls
@@ -183,13 +211,13 @@ const clearEvents = () => {
 
 document.addEventListener('DOMContentLoaded', () => {
   const filterInputEls = [].slice.call(
-    document.getElementsByClassName('form-check-input')
+    document.getElementsByClassName('nav__filters-check-input')
   );
   filterInputEls.forEach((input) =>
     input.addEventListener('change', filterEvents)
   );
 
-  const searchInputEl = document.getElementById('search');
+  const searchInputEl = document.getElementsByClassName('nav__search-input')[0];
   searchInputEl.addEventListener('keyup', filterEvents);
 
   const resetBtn = document.getElementById('reset');
@@ -201,7 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const userIdsBtn = document.getElementById('userId');
   userIdsBtn.addEventListener('click', getUserInfo);
 
-  const anonIdsBtn = document.getElementById('anonId');
+  const anonIdsBtn = document.getElementById('anonymousId');
   anonIdsBtn.addEventListener('click', getUserInfo);
 
   const userTraitsBtn = document.getElementById('userTraits');
@@ -210,10 +238,13 @@ document.addEventListener('DOMContentLoaded', () => {
   postMessage('update');
 });
 
-const getUserInfo = () => {
+const getUserInfo = (e) => {
   chrome.tabs.query({ currentWindow: true, active: true }, (tabs) => {
     const activeTab = tabs[0];
-    chrome.tabs.sendMessage(activeTab.id, { type: 'getUserInfo' });
+    chrome.tabs.sendMessage(activeTab.id, {
+      type: 'getUserInfo',
+      id: e.target.id,
+    });
   });
 };
 
@@ -222,9 +253,10 @@ const resetFilters = () => {
 };
 
 const filterEvents = () => {
-  const searchValue = document.getElementById('search').value;
+  const searchValue =
+    document.getElementsByClassName('nav__search-input')[0].value;
   const filterInputEls = [].slice.call(
-    document.getElementsByClassName('form-check-input')
+    document.getElementsByClassName('nav__filters-check-input')
   );
   const filters = filterInputEls
     .filter((filter) => filter.checked)

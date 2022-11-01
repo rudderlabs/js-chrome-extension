@@ -7,7 +7,7 @@ browserScript.onload = function () {
 
 chrome.runtime.onMessage.addListener((msg) => {
   if (msg.type === 'getUserInfo') {
-    window.postMessage({ type: 'getUserInfo' }, '*');
+    window.postMessage(msg, '*');
   }
 });
 

@@ -37,11 +37,14 @@ const addEvent = (event, tabId) => {
 };
 
 const updateEvents = (tabId, port) => {
+  console.log('updateEvents: ', tabData);
   if (
     tabData[tabId] &&
     tabData[tabId].filters &&
-    tabData[tabId].filters.length > 0
+    (tabData[tabId].filters.length > 0 || tabData[tabId].searchValue !== '')
   ) {
+    console.log('about to filter: ', tabData);
+
     filterEvents(
       tabId,
       tabData[tabId].searchValue,
@@ -88,6 +91,7 @@ const clearEvents = (tabId, port) => {
 };
 
 const filterEvents = (tabId, searchValue, filters, port) => {
+  console.log('filterEvents');
   tabData[tabId].filters = filters;
   tabData[tabId].searchValue = searchValue;
   let filteredEvents;
@@ -128,8 +132,6 @@ chrome.webRequest.onBeforeRequest.addListener(
     if (isRudderStackCall(details.url)) {
       dataPlane = details.url.replace(/page|track|identify/gi, '');
       // console.log('dataPlane: ', dataPlane);
-      console.log(details);
-      console.log(details.requestBody);
       try {
         const requestBody = String.fromCharCode.apply(
           null,

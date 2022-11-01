@@ -18,15 +18,9 @@
   </head>
   <body>
     <nav class="nav">
-      <div class="nav-left">
-        <div class="nav-left__logo">
-          <svg
-            class="MuiBox-root css-13q71s1"
-            fill="#eeeeee"
-            width="180"
-            height="20"
-            viewBox="0 0 180 20"
-          >
+      <div class="nav__left">
+        <div class="nav__logo">
+          <svg fill="#eeeeee" width="180" height="20" viewBox="0 0 180 20">
             <path
               d="M150.224 0.762183H149.77V0.436279H151.123V0.762183H150.672V1.85095H150.225V0.762183H150.224Z"
             ></path>
@@ -83,68 +77,96 @@
             ></path>
           </svg>
         </div>
-        <div class="nav-left__title">
-          <h1>Events Tracked to RudderStack</h1>
-        </div>
+        <h1 class="nav__title">Event Tracker</h1>
       </div>
-      <div class="nav-right">
-        <div class="nav-right__search">
+      <div class="nav__right">
+        <div class="nav__search">
           <input
-            id="search"
+            class="nav__search-input"
             type="text"
             placeholder="Search RudderStack Events"
             value=""
+            autofocus="autofocus"
           />
         </div>
-        <div class="nav-right__filters">
-          <div class="form-check form-check-inline">
+        <div class="nav__filters">
+          <div class="nav__filters-check form-check form-check-inline">
             <input
-              class="form-check-input"
+              class="nav__filters-check-input form-check-input"
               type="checkbox"
               id="inlineCheckbox1"
               value="page"
             />
-            <label class="form-check-label" for="inlineCheckbox1">Page</label>
+            <label
+              class="nav__filters-check-label form-check-label"
+              for="inlineCheckbox1"
+              >Page</label
+            >
           </div>
-          <div class="form-check form-check-inline">
+          <div class="nav__filters-check form-check form-check-inline">
             <input
-              class="form-check-input"
+              class="nav__filters-check-input form-check-input"
               type="checkbox"
               id="inlineCheckbox2"
               value="track"
             />
-            <label class="form-check-label" for="inlineCheckbox2">Track</label>
+            <label
+              class="nav__filters-check-label form-check-label"
+              for="inlineCheckbox2"
+              >Track</label
+            >
           </div>
-          <div class="form-check form-check-inline">
+          <div class="nav__filters-check form-check form-check-inline">
             <input
-              class="form-check-input"
+              class="nav__filters-check-input form-check-input"
               type="checkbox"
               id="inlineCheckbox3"
               value="identify"
             />
-            <label class="form-check-label" for="inlineCheckbox3"
+            <label
+              class="nav__filters-check-label form-check-label"
+              for="inlineCheckbox3"
               >Identify</label
             >
           </div>
         </div>
-        <div class="nav-right__reset-button button">
-          <!-- <button id="reset">Reset Filters</button> -->
-          <button id="reset" type="button" class="btn btn-dark" disabled>
+        <div class="nav__reset">
+          <button
+            id="reset"
+            type="button"
+            class="nav__reset__button btn btn-dark"
+            disabled
+          >
             Reset Filters
           </button>
         </div>
       </div>
     </nav>
     <div class="user-data">
-      <button id="userId" type="button" class="btn btn-outline-dark">
-        Get User ID
-      </button>
-      <button id="anonId" type="button" class="btn btn-outline-dark">
-        Get Anonymous ID
-      </button>
-      <button id="userTraits" type="button" class="btn btn-outline-dark">
-        Get User Traits
-      </button>
+      <div class="user-data__buttons-container">
+        <button
+          id="userId"
+          type="button"
+          class="user-data__button btn btn-outline-dark"
+        >
+          Get User ID
+        </button>
+        <button
+          id="anonymousId"
+          type="button"
+          class="user-data__button btn btn-outline-dark"
+        >
+          Get Anonymous ID
+        </button>
+        <button
+          id="userTraits"
+          type="button"
+          class="user-data__button btn btn-outline-dark"
+        >
+          Get User Traits
+        </button>
+      </div>
+      <div class="user-data__info"></div>
     </div>
     <div class="content">
       <div class="contet__events-container">
