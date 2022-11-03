@@ -211,10 +211,6 @@ const renderSeachAndFilters = (msg) => {
         'block')
     : (document.getElementById('flexSwitchCheckDefault').style.display =
         'block');
-  // document.getElementById('flexSwitchCheckChecked').checked =
-  //   msg.isCustomDomain;
-  // document.getElementById('flexSwitchCheckDefault').checked =
-  //   msg.isCustomDomain;
 };
 
 const syntaxHighlight = (payload) => {
@@ -260,8 +256,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const resetBtn = document.getElementById('reset');
   resetBtn.addEventListener('click', resetFilters);
 
-  const selfHostedToggle = document.getElementById('flexSwitchCheckDefault');
-  selfHostedToggle.addEventListener('change', updateDataPlaneURL);
+  const customDomainToggles = [].slice.call(
+    document.getElementsByClassName('nav__custom-domain__input')
+  );
+  customDomainToggles.forEach((toggle) =>
+    toggle.addEventListener('change', updateDataPlaneURL)
+  );
 
   const clearBtn = document.getElementById('clear');
   clearBtn.addEventListener('click', clearEvents);

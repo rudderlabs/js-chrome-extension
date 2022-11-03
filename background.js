@@ -1,6 +1,6 @@
 let tabData = {};
 let dataPlane;
-let isCustomDomain;
+let isCurrentTabCustomDomain;
 let writeKey;
 
 chrome.runtime.onConnect.addListener((port) => {
@@ -8,20 +8,30 @@ chrome.runtime.onConnect.addListener((port) => {
     let tabId = msg.tabId;
     let searchValue = msg.searchValue;
     let filters = msg.filters;
-    if (msg.type === 'update') {
-      updateEvents(tabId, port);
-    } else if (msg.type === 'clear') {
-      clearEvents(tabId, port);
-    } else if (msg.type === 'filter') {
-      filterEvents(tabId, searchValue, filters, port);
-    } else if (msg.type === 'reset') {
-      resetEvents(tabId, port);
-    } else if (msg.type === 'custom-domain') {
-      isCustomDomain = true;
-      tabData[tabId].isCustomDomain = true;
-    } else if (msg.type === 'rudderstack-domain') {
-      isCustomDomain = false;
-      tabData[tabId].isCustomDomain = false;
+
+    switch (msg.type) {
+      case 'update':
+        updateEvents(tabId, port);
+        break;
+      case 'clear':
+        clearEvents(tabId, port);
+        break;
+      case 'filter':
+        filterEvents(tabId, searchValue, filters, port);
+        break;
+      case 'reset':
+        resetEvents(tabId, port);
+        break;
+      case 'custom-domain':
+        isCurrentTabCustomDomain = true;
+        tabData[tabId].isCustomDomain = true;
+        break;
+      case 'rudderstack-domain':
+        isCurrentTabCustomDomain = false;
+        tabData[tabId].isCustomDomain = false;
+        break;
+      default:
+        console.log('msg.type does not match any action: ', msg.type);
     }
   });
 });
@@ -42,6 +52,7 @@ const isRudderStackConfig = (requestUrl) => {
 };
 
 const addEvent = (event, tabId) => {
+  console.log('addEvent: ', tabData[tabId]);
   tabData[tabId] = tabData[tabId] || {};
   tabData[tabId].events = tabData[tabId].events || [];
   tabData[tabId].events.unshift(event);
@@ -66,6 +77,7 @@ const updateEvents = (tabId, port) => {
     tabData[tabId].filters = tabData[tabId].filters || [];
     tabData[tabId].searchValue = tabData[tabId].searchValue || '';
     tabData[tabId].isCustomDomain = tabData[tabId].isCustomDomain || false;
+    isCurrentTabCustomDomain = tabData[tabId].isCustomDomain || false;
     if (tabData[tabId]) {
       port.postMessage({
         type: 'update',
@@ -103,6 +115,7 @@ const clearEvents = (tabId, port) => {
 };
 
 const filterEvents = (tabId, searchValue, filters, port) => {
+  console.log('filterEvents: ', tabData[tabId]);
   tabData[tabId].filters = filters;
   tabData[tabId].searchValue = searchValue;
   let filteredEvents;
@@ -141,26 +154,30 @@ const filterEvents = (tabId, searchValue, filters, port) => {
 
 chrome.webRequest.onBeforeRequest.addListener(
   (details) => {
-    if (isCustomDomain) {
+    if (isCurrentTabCustomDomain) {
       if (isCustomDomainCall(details.url)) {
         dataPlane = details.url.replace(/page|track|identify/gi, '');
-        console.log('dataPlane: ', dataPlane);
         try {
           const requestBody = String.fromCharCode.apply(
             null,
             new Uint8Array(details.requestBody.raw[0].bytes)
           );
-          const event = {
-            tabId: details.tabId,
-            payload: JSON.parse(requestBody),
-          };
-          chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-            if (tabs[0]) {
-              if (tabs[0].id === details.tabId) {
-                addEvent(event, tabs[0].id);
+          if (
+            JSON.parse(requestBody).context.library.name ===
+            'RudderLabs JavaScript SDK'
+          ) {
+            const event = {
+              tabId: details.tabId,
+              payload: JSON.parse(requestBody),
+            };
+            chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+              if (tabs[0]) {
+                if (tabs[0].id === details.tabId) {
+                  addEvent(event, tabs[0].id);
+                }
               }
-            }
-          });
+            });
+          }
         } catch (e) {
           console.log('error: ', e);
         }
@@ -168,7 +185,6 @@ chrome.webRequest.onBeforeRequest.addListener(
     } else {
       if (isRudderStackCall(details.url)) {
         dataPlane = details.url.replace(/page|track|identify/gi, '');
-        console.log('dataPlane: ', dataPlane);
         try {
           const requestBody = String.fromCharCode.apply(
             null,

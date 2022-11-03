@@ -42,6 +42,10 @@ body {
   font-size: 18px;
 }
 
+.nav__right {
+  font-size: 12px;
+}
+
 .nav__search .nav__search-input {
   margin: 0;
   font-family: inherit;
@@ -54,6 +58,12 @@ body {
   width: 100%;
   height: 60%;
   padding: 5px;
+}
+
+.nav__filters {
+  display: flex;
+  justify-content: space-between;
+  font-size: 16px;
 }
 
 .nav__self-hosted {
@@ -252,6 +262,10 @@ body {
 
 .contet__events-container__text {
   text-align: center;
+}
+
+.nav__custom-domain {
+  margin: 2% 0 0 0;
 }
 
 .nav__custom-domain__input#flexSwitchCheckChecked,
