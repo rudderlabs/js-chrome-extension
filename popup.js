@@ -14,6 +14,7 @@ chrome.runtime.onMessage.addListener((msg) => {
     postMessage('update');
   } else if (msg.type === 'userInfo') {
     displayUserInfo(msg);
+    updateUserInfoBtnsCSS(msg);
   }
 });
 
@@ -23,17 +24,24 @@ const displayUserInfo = (msg) => {
     userInfoEl.innerHTML =
       msg[msg.id] === ''
         ? `<pre class="user-data__info__text"><code>Undentified User</code></pre>`
-        : `<pre class="user-data__info__text"><code>${
-            msg[msg.id]
-          }</code></pre>`;
+        : `<pre class="user-data__info__text">` +
+          `<button class="btn btn-outline-dark btn--copy-to-clipboard" title="Copy To Clipboard">` +
+          `<img class="img--copy-to-clipboard" src="c2c-black.png" title="Copy To Clipboard"/>` +
+          `</button>` +
+          `<code>${msg[msg.id]}</code></pre>`;
   } else if (msg.id === 'anonymousId') {
-    userInfoEl.innerHTML = `<pre class="user-data__info__text"><code>${
-      msg[msg.id]
-    }</code></pre>`;
+    userInfoEl.innerHTML =
+      `<pre class="user-data__info__text">` +
+      `<button class="btn btn-outline-dark btn--copy-to-clipboard" title="Copy To Clipboard">` +
+      `<img class="img--copy-to-clipboard" src="c2c-black.png" title="Copy To Clipboard"/>` +
+      `</button>` +
+      `<code>${msg[msg.id]}</code></pre>`;
   } else if (msg.id === 'userTraits') {
     if (Object.keys(msg[msg.id]).length > 0) {
       userInfoEl.innerHTML =
         `<pre class="user-data__info__json">` +
+        `<button class="btn btn-outline-dark btn--copy-to-clipboard" title="Copy To Clipboard">` +
+        `<img class="img--copy-to-clipboard" src="c2c-black.png" title="Copy To Clipboard"/>` +
         `</button>` +
         `<code>${syntaxHighlight(
           JSON.stringify(msg[msg.id], undefined, 2)
@@ -43,6 +51,20 @@ const displayUserInfo = (msg) => {
       userInfoEl.innerHTML = '<pre><code>No User Traits</code></pre>';
     }
   }
+  addCopyToClipboardListeners();
+};
+
+const updateUserInfoBtnsCSS = (msg) => {
+  const userInfoBtns = [].slice.call(
+    document.getElementsByClassName('btn--user-data')
+  );
+  userInfoBtns.forEach((btn) => {
+    if (btn.id === msg.id) {
+      btn.classList.add('btn--user-data--active');
+    } else {
+      btn.classList.remove('btn--user-data--active');
+    }
+  });
 };
 
 const postMessage = (type, searchValue = '', filters = []) => {
@@ -65,28 +87,32 @@ const renderEvents = (msg) => {
     msg.events.map(
       (m) =>
         (eventsContainer.innerHTML +=
-          `<div class="event ${m.payload.type} collapsed" data-type="${m.payload.type}">` +
-          `<div class="event-details__short">` +
-          `<div class="event-details__short top">` +
-          `<span class="event-details__short type">${m.payload.type}</span>` +
-          `<span class="event-details__short name">${
+          `<div class="event event--${m.payload.type} event--collapsed" data-type="${m.payload.type}">` +
+          `<div class="event__details">` +
+          `<div class="event__details--top">` +
+          `<span class="event__details--text event__details--text--${m.payload.type}">${m.payload.type}</span>` +
+          `<span class="event__details--text event__details--text--${
+            m.payload.type
+          }">${
             m.payload.event ? `&nbsp;|&nbsp;${m.payload.event}` : ''
           }</span>` +
           `</div>` +
-          `<div class="event-details__short bottom">` +
-          `<span class="event-details__short userId">${
+          `<div class="event__details--bottom">` +
+          `<span class="event__details--text event__details--text--user-id">${
             m.payload.userId
               ? `User ID:<br> ${m.payload.userId}`
               : 'Unidentified<br>User'
           }</span>` +
-          `<span class="event-details__short anonymousId">Anonymous ID:<br> ${m.payload.anonymousId}</span>` +
-          `<span class="event-details__short sentAt">Sent At:<br> ${m.payload.sentAt}</span>` +
+          `<span class="event__details--text event__details--text--anonymoud-id">Anonymous ID:<br> ${m.payload.anonymousId}</span>` +
+          `<span class="event__details--text event__details--text--sent-at">Sent At:<br> ${m.payload.sentAt
+            .replace('Z', '')
+            .replace('T', ' ')}</span>` +
           `</div>` +
           `</div>` +
-          `<div class="event-details__full">` +
+          `<div class="event__details--expanded">` +
           `<pre>` +
-          `<button id="copyToClipboard" class="copy-to-clipboard btn btn-outline-dark" title="Copy To Clipboard">` +
-          `<img class="copy-to-clipboard" src="c2c-black.png" title="Copy To Clipboard"/>` +
+          `<button class="btn btn-outline-dark btn--copy-to-clipboard" title="Copy To Clipboard">` +
+          `<img class="img--copy-to-clipboard" src="c2c-black.png" title="Copy To Clipboard"/>` +
           `</button>` +
           `<code>${syntaxHighlight(
             JSON.stringify(m.payload, undefined, 2)
@@ -96,7 +122,7 @@ const renderEvents = (msg) => {
           `<div>`)
     );
   } else {
-    eventsContainer.innerHTML = `<div class="contet__events-container-no-events">RudderStack Events Will Show Up Here</div>`;
+    eventsContainer.innerHTML = `<div class="contet__events-container__text">RudderStack Events Will Show Up Here</div>`;
   }
   addEventCollapseExpandListeners();
   setClearBtnDisableAttribute(msg.events);
@@ -106,19 +132,20 @@ const renderEvents = (msg) => {
 
 const addEventCollapseExpandListeners = () => {
   var eventElements = [].slice.call(
-    document.getElementsByClassName('event-details__short')
+    document.getElementsByClassName('event__details')
   );
   for (const eventEl of eventElements) {
     eventEl.addEventListener('click', () => {
       if (
-        [].slice.call(eventEl.parentElement.classList).indexOf('collapsed') !=
-        -1
+        [].slice
+          .call(eventEl.parentElement.classList)
+          .indexOf('event--collapsed') != -1
       ) {
-        eventEl.parentElement.classList.remove('collapsed');
-        eventEl.parentElement.classList.add('expanded');
+        eventEl.parentElement.classList.remove('event--collapsed');
+        eventEl.parentElement.classList.add('event--expanded');
       } else {
-        eventEl.parentElement.classList.add('collapsed');
-        eventEl.parentElement.classList.remove('expanded');
+        eventEl.parentElement.classList.add('event--collapsed');
+        eventEl.parentElement.classList.remove('event--expanded');
       }
     });
   }
@@ -136,7 +163,7 @@ const setResetBtnDisableAttribute = (filters, searchValue) => {
 
 const addCopyToClipboardListeners = () => {
   const icons = [].slice.call(
-    document.getElementsByClassName('copy-to-clipboard')
+    document.getElementsByClassName('btn--copy-to-clipboard')
   );
   for (const icon of icons) {
     icon.addEventListener('click', () => {
@@ -178,6 +205,16 @@ const renderSeachAndFilters = (msg) => {
   } else {
     filterInputEls.map((input) => (input.checked = false));
   }
+
+  msg.isCustomDomain
+    ? (document.getElementById('flexSwitchCheckChecked').style.display =
+        'block')
+    : (document.getElementById('flexSwitchCheckDefault').style.display =
+        'block');
+  // document.getElementById('flexSwitchCheckChecked').checked =
+  //   msg.isCustomDomain;
+  // document.getElementById('flexSwitchCheckDefault').checked =
+  //   msg.isCustomDomain;
 };
 
 const syntaxHighlight = (payload) => {
@@ -223,6 +260,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const resetBtn = document.getElementById('reset');
   resetBtn.addEventListener('click', resetFilters);
 
+  const selfHostedToggle = document.getElementById('flexSwitchCheckDefault');
+  selfHostedToggle.addEventListener('change', updateDataPlaneURL);
+
   const clearBtn = document.getElementById('clear');
   clearBtn.addEventListener('click', clearEvents);
 
@@ -237,6 +277,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   postMessage('update');
 });
+
+const updateDataPlaneURL = (e) => {
+  if (e.target.checked) {
+    postMessage('custom-domain');
+  } else {
+    postMessage('rudderstack-domain');
+  }
+};
 
 const getUserInfo = (e) => {
   chrome.tabs.query({ currentWindow: true, active: true }, (tabs) => {
