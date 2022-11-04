@@ -52,7 +52,6 @@ const isRudderStackConfig = (requestUrl) => {
 };
 
 const addEvent = (event, tabId) => {
-  console.log('addEvent: ', tabData[tabId]);
   tabData[tabId] = tabData[tabId] || {};
   tabData[tabId].events = tabData[tabId].events || [];
   tabData[tabId].events.unshift(event);
@@ -115,7 +114,6 @@ const clearEvents = (tabId, port) => {
 };
 
 const filterEvents = (tabId, searchValue, filters, port) => {
-  console.log('filterEvents: ', tabData[tabId]);
   tabData[tabId].filters = filters;
   tabData[tabId].searchValue = searchValue;
   let filteredEvents;

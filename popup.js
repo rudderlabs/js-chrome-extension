@@ -23,32 +23,33 @@ const displayUserInfo = (msg) => {
   if (msg.id === 'userId') {
     userInfoEl.innerHTML =
       msg[msg.id] === ''
-        ? `<pre class="user-data__info__text"><code>Undentified User</code></pre>`
+        ? `<pre class="user-data__info__text"><code class="event__details__text--lg">Undentified User</code></pre>`
         : `<pre class="user-data__info__text">` +
           `<button class="btn btn-outline-dark btn--copy-to-clipboard" title="Copy To Clipboard">` +
           `<img class="img--copy-to-clipboard" src="c2c-black.png" title="Copy To Clipboard"/>` +
           `</button>` +
-          `<code>${msg[msg.id]}</code></pre>`;
+          `<code class="event__details__text--lg">${msg[msg.id]}</code></pre>`;
   } else if (msg.id === 'anonymousId') {
     userInfoEl.innerHTML =
       `<pre class="user-data__info__text">` +
       `<button class="btn btn-outline-dark btn--copy-to-clipboard" title="Copy To Clipboard">` +
       `<img class="img--copy-to-clipboard" src="c2c-black.png" title="Copy To Clipboard"/>` +
       `</button>` +
-      `<code>${msg[msg.id]}</code></pre>`;
+      `<code class="event__details__text--lg">${msg[msg.id]}</code></pre>`;
   } else if (msg.id === 'userTraits') {
     if (Object.keys(msg[msg.id]).length > 0) {
       userInfoEl.innerHTML =
-        `<pre class="user-data__info__json">` +
+        `<pre class="event__details__json">` +
         `<button class="btn btn-outline-dark btn--copy-to-clipboard" title="Copy To Clipboard">` +
         `<img class="img--copy-to-clipboard" src="c2c-black.png" title="Copy To Clipboard"/>` +
         `</button>` +
-        `<code>${syntaxHighlight(
+        `<code class="event__details__text--lg">${syntaxHighlight(
           JSON.stringify(msg[msg.id], undefined, 2)
         )}</code>` +
         `</pre>`;
     } else {
-      userInfoEl.innerHTML = '<pre><code>No User Traits</code></pre>';
+      userInfoEl.innerHTML =
+        '<pre><code class="event__details__text--lg">No User Traits</code></pre>';
     }
   }
   addCopyToClipboardListeners();
@@ -79,9 +80,8 @@ const postMessage = (type, searchValue = '', filters = []) => {
 };
 
 const renderEvents = (msg) => {
-  const eventsContainer = document.getElementsByClassName(
-    'contet__events-container'
-  )[0];
+  const eventsContainer =
+    document.getElementsByClassName('events-container')[0];
   if (msg.events.length > 0) {
     eventsContainer.innerHTML = '';
     msg.events.map(
@@ -89,32 +89,34 @@ const renderEvents = (msg) => {
         (eventsContainer.innerHTML +=
           `<div class="event event--${m.payload.type} event--collapsed" data-type="${m.payload.type}">` +
           `<div class="event__details">` +
-          `<div class="event__details--top">` +
-          `<span class="event__details--text event__details--text--${m.payload.type}">${m.payload.type}</span>` +
-          `<span class="event__details--text event__details--text--${
+          `<div class="event__details__top">` +
+          `<span class="event__details__text event__details__text--${
             m.payload.type
           }">${
+            m.payload.type.charAt(0).toUpperCase() + m.payload.type.slice(1)
+          }</span>` +
+          `<span class="event__details__text">${
             m.payload.event ? `&nbsp;|&nbsp;${m.payload.event}` : ''
           }</span>` +
           `</div>` +
-          `<div class="event__details--bottom">` +
-          `<span class="event__details--text event__details--text--user-id">${
+          `<div class="event__details__bottom">` +
+          `<span class="event__details__text event__details__text--user-id">${
             m.payload.userId
-              ? `User ID:<br> ${m.payload.userId}`
-              : 'Unidentified<br>User'
+              ? `User ID:<br><div class="event__details__text--sm">${m.payload.userId}</div>`
+              : '<code class="event__details__text--sm">Unidentified<br>User</code>'
           }</span>` +
-          `<span class="event__details--text event__details--text--anonymoud-id">Anonymous ID:<br> ${m.payload.anonymousId}</span>` +
-          `<span class="event__details--text event__details--text--sent-at">Sent At:<br> ${m.payload.sentAt
+          `<span class="event__details__text event__details__text--anonymoud-id">Anonymous ID:<br><div class="event__details__text--sm">${m.payload.anonymousId}</div></span>` +
+          `<span class="event__details__text event__details__text--sent-at">Sent At:<br><div class="event__details__text--sm">${m.payload.sentAt
             .replace('Z', '')
-            .replace('T', ' ')}</span>` +
+            .replace('T', ' ')}</div></span>` +
           `</div>` +
           `</div>` +
           `<div class="event__details--expanded">` +
-          `<pre>` +
+          `<pre class="event__details__json">` +
           `<button class="btn btn-outline-dark btn--copy-to-clipboard" title="Copy To Clipboard">` +
           `<img class="img--copy-to-clipboard" src="c2c-black.png" title="Copy To Clipboard"/>` +
           `</button>` +
-          `<code>${syntaxHighlight(
+          `<code class="event__details__text--sm">${syntaxHighlight(
             JSON.stringify(m.payload, undefined, 2)
           )}</code>` +
           `</pre>` +
@@ -122,7 +124,7 @@ const renderEvents = (msg) => {
           `<div>`)
     );
   } else {
-    eventsContainer.innerHTML = `<div class="contet__events-container__text">RudderStack Events Will Show Up Here</div>`;
+    eventsContainer.innerHTML = `<div class="events-container__text">RudderStack Events Will Show Up Here</div>`;
   }
   addEventCollapseExpandListeners();
   setClearBtnDisableAttribute(msg.events);
