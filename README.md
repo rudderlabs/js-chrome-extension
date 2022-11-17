@@ -2,8 +2,8 @@
 
 ## Description
 Customer Success TAM team created a Beta for a chrome extension to inspect events being sent to RudderStack on our customers' websites. Version 1.0 includes the following features:
-### * RudderStack Events Log (page, track, identify), including full payloads
-### * User Info, including: userId, anonymousId & userTraits
+- RudderStack Events Log (page, track, identify), including full payloads
+- User Info, including: userId, anonymousId & userTraits
 
 ## Inspiration
 Modeled off of a [Chrome Extension](https://chrome.google.com/webstore/detail/segment-event-tracker/hbanigoffkilibdakdmmlgefndpjmajl) that was created for inspecting Segment events
