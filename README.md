@@ -1,7 +1,9 @@
 # js-chrome-extension
 
 ## Description
-Customer Success and TAMs are creating a Beta for a chrome extension to inspect events being sent to RudderStack on our customer's websites
+Customer Success TAM team created a Beta for a chrome extension to inspect events being sent to RudderStack on our customers' websites. Version 1.0 includes the following features:
+### * RudderStack Events Log (page, track, identify), including full payloads
+### * User Info, including: userId, anonymousId & userTraits
 
 ## Inspiration
 Modeled off of a [Chrome Extension](https://chrome.google.com/webstore/detail/segment-event-tracker/hbanigoffkilibdakdmmlgefndpjmajl) that was created for inspecting Segment events
@@ -18,3 +20,6 @@ Modeled off of a [Chrome Extension](https://chrome.google.com/webstore/detail/se
 
 ### 4. Click 'Unload Unpacked' (top left) and select the unzipped folder downloaded in step 2:
 ![ezgif com-gif-maker (3)](https://user-images.githubusercontent.com/106251387/202495198-9f492346-bd57-41e3-963d-0ef8a6c443ff.gif)
+
+### The extension is now available in your chrome browser and can be found in the extensions bar:
+![ezgif com-gif-maker (4)](https://user-images.githubusercontent.com/106251387/202553534-57f5f860-7042-4db8-bd04-b269c2e794b6.gif)
