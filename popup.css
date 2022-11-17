@@ -1,137 +1,270 @@
+* {
+  margin: 0;
+  padding: 0;
+  font-family: 'Basis Grotesque Pro Light', sans-serif;
+}
+
 body {
-    padding: 10px;
-    overflow: hidden;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif
+  width: 800px;
+  height: auto;
 }
-#trackMessages {
-    max-height: 460px;
-    overflow: auto;
-    font-size: 14px;
+
+.nav {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  height: auto;
+  width: 100%;
+  padding: 1.5%;
+  color: #fff;
+  background-color: #070e1f;
 }
-#trackMessages::-webkit-scrollbar {
-    width: 12px;
+
+.nav__left {
+  display: flex;
+  flex-direction: column;
 }
-#trackMessages::-webkit-scrollbar-track {
-    background: #FFFFFF;
+
+.nav__logo,
+.nav__title {
+  display: inline-block;
+  margin: 0;
 }
-#trackMessages::-webkit-scrollbar-thumb {
-    background: #52BD95;
-    border-radius: 5px;
+
+.nav__title h1 {
+  font-size: 18px;
 }
-#filterInput {
-    position: absolute;
-    right: 110px;
-    top: 20px;
-    height: 35px;
-    background-color: #FFFFFF;
-    border-radius: 4px;
-    border-color: #1D1D1B;
+
+.nav__right {
+  font-size: 12px;
 }
-#configureButton {
-    position: absolute;
-    right: 20px;
-    top: 20px;
-    background-color: #1D1D1B;
-    border-radius: 4px;
-    color: #FFFFFF;
+
+.nav__search-input {
+  margin: 0;
+  font-family: inherit;
+  tab-size: 4;
+  font-size: 14px;
+  line-height: inherit;
+  border: 0 solid;
+  box-sizing: border-box;
+  border-radius: 5px;
+  width: 100%;
+  height: 60%;
+  padding: 5px;
 }
-.configurationDiv {
-    width: 100%;
+
+.nav__filters {
+  display: flex;
+  justify-content: space-between;
+  font-size: 16px;
+  margin: 1% 0;
 }
-#apiDomain {
-    width: 100%;
-    margin-top: 10px;
+
+.nav__custom-domain {
+  margin: 2% 0 0 0;
 }
-.eventTracked {
-    padding: 10px;
-    margin-bottom: 1px;
+
+.nav__custom-domain__input#flexSwitchCheckChecked,
+.nav__custom-domain__input#flexSwitchCheckDefault {
+  display: none;
 }
-.eventTracked.hidden {
-    display: none;
+
+.user-data {
+  display: flex;
+  flex-direction: row;
+  height: 110px;
+  padding: 1% 1% 0 1%;
 }
-.eventInfo {
-    font-size: 16px;
-    cursor: pointer;
+
+.user-data__buttons-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin-right: 1%;
 }
-.eventName {
-    color: #FFFFFF;
+
+.user-data__info {
+  position: relative;
+  padding: 1%;
+  border-radius: 5px;
+  border: 1px solid black;
+  width: 100%;
+  overflow-y: scroll;
+  margin-bottom: 0;
 }
-.eventContent {
-    display: none;
-    font-size: 14px;
-    background-color: #FFFFFF;
-    padding: 10px;
-    margin-top: 10px;
-    margin-bottom: 10px;
-    overflow-y: auto;
-    height: 400px;
-    border: 1px solid #DDDDDD;
-    white-space: pre;
-    color: #1D1D1B;
+
+.user-data__info__text {
+  position: relative;
+  height: 100%;
 }
-.eventContent::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+
+.main {
+  padding: 1%;
 }
-.eventContent::-webkit-scrollbar-track {
-    background: #FFFFFF;
+
+.events-container {
+  height: 298px;
+  overflow-y: scroll;
 }
-.eventContent::-webkit-scrollbar-thumb {
-    background-color: rgb(53, 36, 70);
-    border-radius: 5px;
+
+.events-container__text {
+  text-align: center;
 }
+
+.event {
+  margin-bottom: 1%;
+  padding: 1%;
+  border-radius: 5px;
+}
+
+.event:hover {
+  background-color: #f5f5f5;
+}
+
+.event--page {
+  border: 1px solid #d692f6;
+  border-width: medium;
+}
+
+.event--page .event__details__top {
+  color: #d692f6;
+}
+
+.event--track {
+  border: 1px solid #3e34d1;
+  border-width: medium;
+}
+
+.event--track .event__details__top {
+  color: #3e34d1;
+}
+
+.event--identify {
+  border: 1px solid #32d0aa;
+  border-width: medium;
+}
+
+.event--identify .event__details__top {
+  color: #32d0aa;
+}
+
+.event__details {
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+}
+
+.event__details__top {
+  font-size: 20px;
+}
+
+.event__details__bottom {
+  justify-content: space-between;
+}
+
+.event__details__top,
+.event__details__bottom {
+  display: flex;
+  flex-direction: row;
+}
+
+.event__details__bottom .event__details__text {
+  font-weight: 700;
+  font-size: 20px;
+  color: #000;
+  font-size: 12px;
+}
+
+.event__details__text--sm,
+.event__details__text--lg {
+  color: #000;
+}
+
+.event--collapsed .event__details--expanded {
+  display: none;
+}
+
+.event--expanded .event__details--expanded {
+  display: block;
+  margin-top: 1%;
+}
+
+.clear-events {
+  text-align: right;
+}
+
+.btn {
+  box-sizing: inherit;
+  padding-top: 3px;
+  padding-bottom: 3px;
+  font-size: 14px;
+}
+
+.btn--reset {
+  border-color: #fff;
+  width: 100%;
+}
+
+.btn--clear,
+.btn--copy-to-clipboard {
+  width: 46px;
+  height: 34px;
+}
+
+.btn--user-data {
+  width: 254.172px;
+}
+
+.btn--user-data--active {
+  color: #fff;
+  background-color: #212529;
+}
+
+.event__details__json {
+  border-radius: 5px;
+  position: relative;
+  background-color: #fff;
+  color: #000;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 12px;
+  margin-bottom: 0;
+  height: 100%;
+  width: 100%;
+}
+
 .string {
-    color: green;
+  color: red;
 }
 .number {
-    color: blue;
+  color: blue;
 }
 .boolean {
-    color: purple;
+  color: blue;
 }
 .null {
-    color: magenta;
+  color: red;
 }
 .key {
-    color: black;
-    font-weight: bold;
+  color: purple;
 }
-.logo {
-    float: left;
-    margin-right: 10px;
+
+.btn--copy-to-clipboard {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  z-index: 99999;
+  padding: 0;
+  width: 30px;
+  height: 28px;
 }
-h1 {
-    font-size: 26px;
-    font-weight: normal;
-    margin-top: 0px;
+
+.btn--copy-to-clipboard--margin {
+  top: 2%;
+  right: 1%;
 }
-.buttonDiv {
-    padding-top: 10px;
-    text-align: right;
-}
-input[type=button] {
-    border-width: 0px;
-    background-color: #52BD95;
-    transition: background-color 0.5s;
-    border-radius: 4px;
-    color: #FFFFFF;
-    padding: 10px;
-}
-input[type=button]:hover {
-    background-color: #068465;
-}
-.eventType_identify {
-    background-color: #52BD95;
-    color: #FFFFFF;
-}
-.eventType_pageLoad {
-    background-color: #6156BB;
-    color: #FFFFFF
-}
-.eventType_track {
-    background-color: #1D1D1B;
-    color: #FFFFFF;
-}
-.eventType_batch {
-    background-color: #b890b5;
+
+.img--copy-to-clipboard {
+  height: 16px;
+  width: 16px;
 }
