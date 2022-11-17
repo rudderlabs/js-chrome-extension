@@ -10,7 +10,7 @@ Modeled off of a [Chrome Extension](https://chrome.google.com/webstore/detail/se
 ### 1. Download Zip:
 <img width="1512" alt="Screen Shot 2022-11-17 at 10 38 53 AM" src="https://user-images.githubusercontent.com/106251387/202490843-266db183-842d-44a0-8cea-d0e34931874b.png">
 
-### 2. Go to [I'm an inline-style link](chrome://extensions/) [I'm an inline-style link](https://www.google.com)
+### 2. Go to [I'm an inline-style link](chrome://extensions/)
 
 
 ### 3. Enable Developer Mode (top right)
