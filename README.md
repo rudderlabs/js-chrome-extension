@@ -18,7 +18,7 @@ Modeled off of a [Chrome Extension](https://chrome.google.com/webstore/detail/se
 ### 3. Enable Developer Mode (top right):
 ![ezgif com-gif-maker (2)](https://user-images.githubusercontent.com/106251387/202491948-7bd845af-a106-41f3-9ce2-95af51ae8850.gif)
 
-### 4. Click 'Unload Unpacked' (top left) and select the unzipped folder downloaded in step 2:
+### 4. Click 'Load Unpacked' (top left) and select the unzipped folder downloaded in step 2:
 ![ezgif com-gif-maker (3)](https://user-images.githubusercontent.com/106251387/202495198-9f492346-bd57-41e3-963d-0ef8a6c443ff.gif)
 
 ### The extension is now available in your chrome browser and can be found in the extensions bar:
